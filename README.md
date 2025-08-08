@@ -1,139 +1,240 @@
-这是一个为你改进后的 Python 脚本量身定制的 `README.md` 文件。它清晰地介绍了脚本的功能、安装、使用方法，并提供了详细的参数说明和示例，旨在让用户能快速上手。
+# JSFind - 高级URL和子域名提取工具
 
------
+一个功能强大的Python工具，专门用于从网页和JavaScript文件中提取URL、API端点和子域名。适用于渗透测试、安全研究和Web资产发现。
 
-# URL & Subdomain Extractor (Optimized)
+## ✨ 特性
 
-这是一个功能强大的 Python 脚本，用于从网站和文件中高效、并发地提取 URLs、子域名和页面信息。它支持深度爬取，能够处理动态内容中的链接，并提供多种输出格式，包括纯文本和 JSON。
+- 🚀 **高性能并发处理** - 支持多线程并发访问，大幅提升扫描速度
+- 🎯 **智能URL提取** - 从HTML和JavaScript代码中精确提取各类URL
+- 🌐 **子域名发现** - 自动识别和收集目标域名下的所有子域名
+- 📊 **页面信息分析** - 获取HTTP状态码、页面标题、响应长度等详细信息
+- 🔍 **深度链接爬取** - 支持递归爬取页面中的所有链接
+- 🛡️ **智能过滤** - 自动过滤静态资源，专注于API端点和动态内容
+- 📁 **灵活输出** - 支持多种格式的结果输出和保存
+- 🔄 **会话复用** - 内置连接池和重试机制，提高稳定性
 
-## 主要特性
+## 🚀 快速开始
 
-  - **高效并发**: 使用多线程并发处理 URLs，显著提升扫描速度。
-  - **鲁棒性强**: 内置重试机制，能够应对网络波动和服务器错误（如 500, 429 等）。
-  - **深度提取**: 支持指定爬取深度，能够从链接中发现更多隐藏的资源。
-  - **全面解析**: 不仅从 HTML 中提取链接，还能解析内联和外部 JavaScript 文件中的 URLs。
-  - **智能过滤**: 自动过滤静态资源（如图片、CSS）和无效链接，专注于有价值的端点。
-  - **多种输出**: 支持将结果输出到URLs文件、子域名文件、页面信息文件，或统一的 **JSON** 文件，便于自动化和数据处理。
-  - **友好的用户界面**: 提供进度条，让长时间运行的任务状态一目了然。
-
-## 安装
-
-### 依赖
-
-该脚本依赖于以下 Python 库：
-
-  - `requests`   ——“请求”
-  - `beautifulsoup4`
-  - `tqdm`
-  - `urllib3`
-
-你可以使用 `pip` 一次性安装所有依赖：
-
-```bash   ”“bash   ”“bash”“bash
-pip install requests beautifulsoup4 tqdm urllib3
-```
-
-### 克隆仓库
+### 安装依赖
 
 ```bash
-git clone https://github.com/yourusername/url-extractor.git
-cd url-extractor
+pip install requests beautifulsoup4 urllib3
 ```
 
-（如果你的代码托管在 GitHub 上，可以替换为你的仓库链接）
+### 基本使用
 
-## 使用方法
+```bash
+# 扫描单个URL
+python jsfind.py -u https://example.com
 
-### 基础用法
+# 从文件批量扫描
+python jsfind.py -f urls.txt
 
-  - **从单个 URL 提取**:
+# 深度扫描（跟随链接）
+python jsfind.py -u https://example.com -d
 
-    ```bash
-    python main.py -u https://example.com
-    ```
-
-  - **从文件中的 URLs 批量提取**:
-
-    `urls.txt` 文件内容示例：
-
-    ```
-    https://example.com/page1
-    https://example.com/page2
-    ```
-
-    执行命令：
-
-    ```bash   ”“bash   ”“bash”“bash
-    python main.py -f urls.txt
-    ```
-
-### 深度爬取
-
-使用 `-d` 参数指定爬取深度。例如，爬取首页以及从首页找到的链接，深度为 1。
-
-```bash   ”“bash   ”“bash”“bash
-python main.py -u https://example.com -d 1
+# 带cookie扫描
+python jsfind.py -u https://example.com -c "session_id=xxx; token=yyy"
 ```
 
-### 提取并保存结果
+### 输出结果到文件
 
-  - **同时保存到多个文件**:
-
-    ```bash   ”“bash   ”“bash”“bash
-    python main.py -u https://example.com -d 1 -ou urls.txt -os subdomains.txt -ow web_info.txt
-    ```
-
-  - **保存到 JSON 文件**:
-
-    `--output-json   ——output-json` 参数会将所有结果（URLs、子域名和页面信息）保存到一个结构化的 JSON 文件中。
-
-    ```bash   ”“bash
-    python main.py -u https://example.com -oj results.json
-    ```
-
-## 命令行参数
-
-| 参数              | 缩写 | 类型     | 描述                                       |
-| ----------------- | ---- | -------- | ------------------------------------------ |
-| `--url   url——`           | `-u` | `string` | 目标网站的 URL。                             |
-| `--file   ——文件`          | `-f` | `string   字符串` | 包含 URLs 的文件路径。                         |
-| `--cookie`        | `-c` | `string   字符串` | 请求时使用的 Cookie 字符串。               |
-| `--deep   ——深`          | `-d` | `int`    | 爬取的深度（默认为 0，不进行深度爬取）。 |
-| `--threads   ——线程`       | `-t` | `int`    | 并发线程数（默认为 10）。                    |
-| `--output-urls   ——output-urls`   | `-ou`| `string   字符串` | 发现的 URLs 列表输出文件路径。             |
-| `--output-subdomains   ——output-subdomains`|`-os`|`string   字符串` | 发现的子域名列表输出文件路径。             |
-| `--output-web-info   ——output-web-info`|`-ow   …噢`|`string   字符串` | 页面标题、状态码等信息输出文件路径。       |
-| `--output-json   ——output-json`   | `-oj   ——“请求”`| `string   字符串` | 所有结果的 JSON 格式输出文件路径。         |
-| `--verbose   ——详细`       | `-v   ——“请求”` | `bool   保龄球`   | 启用详细输出，显示更多日志信息。             |
-
-## 示例
-
-### 场景一：单 URL 深度爬取并输出所有结果
-
-```bash   ”“bash   ”“bash”“bash
-python main.py -u https://docs.python.org/3/ -d 2 -ou python_docs_urls.txt -os python_docs_subs.txt -oj python_docs_results.json```bash
-   ""bash   ""bash""bash
-```
+```bash
+python jsfind.py -u https://example.com \
+  -ou urls.txt \
+  -os subdomains.txt \
+  -ow page_info.txt
 ```
 
-  - `url`: 从 `https://docs.python.org/3/` 开始。
-  - `deep   深的`: 爬取深度为 2。
-  - `output-urls`: URLs 保存到 `python_docs_urls.txt`。   ”“bash
-  - `output-subdomains`: 子域名保存到 `python_docs_subs.txt`。   ”“bash   ”“bash   ”“bash
-  - `output-json`: 所有信息保存到 `python_docs_results.json`。
+## 📖 详细用法
 
-### 场景二：使用 Cookie 批量提取
+### 命令行参数
 
+| 参数 | 长参数 | 描述 | 示例 |
+|------|--------|------|------|
+| `-u` | `--url` | 指定目标URL | `-u https://example.com` |
+| `-f` | `--file` | 从文件读取URL列表 | `-f target_urls.txt` |
+| `-c` | `--cookie` | 设置请求Cookie | `-c "session=abc123"` |
+| `-ou` | `--output-urls` | URL结果输出文件 | `-ou discovered_urls.txt` |
+| `-os` | `--output-subdomains` | 子域名输出文件 | `-os subdomains.txt` |
+| `-ow` | `--output-web-info` | 页面信息输出文件 | `-ow page_details.txt` |
+| `-j` | `--js` | 从JS文件中提取URL | `-j` |
+| `-d` | `--deep` | 深度扫描模式 | `-d` |
+| `-t` | `--threads` | 线程数量 | `-t 20` |
+| `-v` | `--verbose` | 详细输出模式 | `-v` |
+
+### 使用场景
+
+#### 1. 单目标扫描
+```bash
+# 基本扫描
+python jsfind.py -u https://target.com
+
+# 带认证扫描
+python jsfind.py -u https://target.com -c "auth_token=xxx"
+```
+
+#### 2. 批量扫描
+```bash
+# 准备URL列表文件
+echo "https://site1.com" > targets.txt
+echo "https://site2.com" >> targets.txt
+
+# 批量扫描
+python jsfind.py -f targets.txt -t 15
+```
+
+#### 3. 深度发现
+```bash
+# 深度扫描，跟随页面链接
+python jsfind.py -u https://target.com -d -ou all_urls.txt
+```
+
+#### 4. JavaScript文件分析
+```bash
+# 专门分析JS文件中的URL
+python jsfind.py -f js_files.txt -j
+```
+
+## 📊 输出格式
+
+### 控制台输出
+```
+找到 156 个URL:
+https://api.example.com/v1/users
+https://api.example.com/v1/posts  
+https://cdn.example.com/assets/app.js
+...
+
+找到 8 个子域名:
+api.example.com
+cdn.example.com
+admin.example.com
+...
+
+页面信息:
+URL: https://example.com | Status: 200 | Title: Example Site | Length: 2048
+```
+
+### 文件输出
+
+**URLs文件 (urls.txt):**
+```
+https://api.example.com/v1/users
+https://api.example.com/v1/posts
+https://api.example.com/v2/auth/login
+```
+
+**子域名文件 (subdomains.txt):**
+```
+api.example.com
+cdn.example.com
+admin.example.com
+```
+
+**页面信息文件 (page_info.txt):**
+```
+URL: https://example.com | Status: 200 | Title: Homepage | Length: 15670网址：https://example.com | 状态：200 | 标题：主页 | 长度：15670
+URL: https://api.example.com | Status: 403 | Title: API Gateway | Length: 1024
+```
+
+## 🔧 高级配置
+
+### 自定义线程数
+```bash
+# 提高并发数以加快扫描速度（注意目标服务器承受能力）
+python jsfind.py -u https://example.com -t 30
+```
+
+### 详细日志输出
+```bash
+# 启用详细日志以便调试
+python jsfind.py -u https://example.com -v
+```
+
+### 组合使用
+```bash   ”“bash   ”“bash”“bashbash   bash   bash   bash```bash
+   ""bash   ""bash""bash   “bash” “bash” “bash”
+```
+# 完整的扫描配置
+python jsfind.py \   Python jsfind.py \
+  -u https://target.com \
+  -c "session_id=xxx; csrf_token=yyy" \会话 ID 为 xxx；CSRF 令牌为 yyy
+  -d \
+  -t 20 \
+  -ou discovered_urls.txt \
+  -os found_subdomains.txt \
+  -ow page_analysis.txt \   -ow page_analysis.txt \ （此句为命令行输入，无实际中文翻译内容）
+  -v
+```
+
+## 🎯 实际应用案例
+
+### 渗透测试中的资产发现
+```bash   ”“bash   ”“bash”“bashbash   bash   bash   bash```bash
+   ""bash   ""bash""bash   “bash” “bash” “bash”“bash” “bash” “bash” “bash” “bash” “bash”
+```
+# 1. 首先进行基础扫描
+python jsfind.py -u https://target.com -ou initial_urls.txt运行 `jsfind.py` 脚本，使用 `-u` 参数指定目标网址为 `https://target.com`，并将初始网址输出到 `initial_urls.txt` 文件中。
+
+# 2. 深度扫描发现更多端点  
+python jsfind.py -u https://target.com -d -ou deep_urls.txt运行 `jsfind.py` 脚本，使用参数 `-u https://target.com` 指定目标网址，使用 `-d` 参数进行深度查找，最后将结果输出到 `deep_urls
+
+# 3. 分析JS文件获取API端点
+python jsfind.py -f js_urls.txt -j -ou api_endpoints.txt运行 `jsfind.py` 脚本，使用 `-f js_urls.txt` 参数指定文件，使用 `-j` 参数启用 JavaScript 分析，使用 `-ou api_endpoints.txt` 参数指定输出文件
+```
+
+### Bug Bounty中的域名枚举
 ```bash   ”“bash
-python main.py -f protected_urls.txt -c "sessionid=xyzabc123" -ou protected_endpoints.txt运行 `main.py` 脚本，使用 `-f` 参数指定文件 `protected_urls.txt`，使用 `-c` 参数设置 `sessionid=xyzabc123`，并将结果输出到 `protected_endpoints.txt` 文件中。
+# 收集子域名进行进一步测试
+python jsfind.py -u https://program.com -d -os subdomains.txtpython jsfind.py -u https://program.com -d -os 子域名.txt
 ```
 
-  - `file   文件`: 从 `protected_urls.txt` 批量读取 URL。
-  - `cookie   饼干`: 使用指定的 Cookie 进行身份验证。
-  - `output-urls`: 提取的 URLs 保存到 `protected_endpoints.txt`。
-   ”“bash
------   ”“bash   ”“bash   ”“bash
+## ⚠️ 注意事项
 
-## 许可证
+1. **请求频率控制** - 使用`-t`参数合理设置线程数，避免对目标服务器造成过大压力
+2. **法律合规** - 仅在授权的测试环境或漏洞奖励项目中使用
+3. **网络环境** - 某些网络环境下可能需要配置代理
+4. **目标限制** - 部分网站可能有反爬虫机制，适当降低并发数
 
-该项目根据 MIT 许可证发布。
+## 🐛 故障排除
+
+### 常见问题
+
+**Q: 扫描速度很慢怎么办？**  
+A: 尝试增加线程数：`-t 20`，但注意不要过高避免被封IP
+
+**Q: 某些页面无法访问？**  
+A: 检查是否需要认证，使用`-c`参数添加cookie
+
+**Q: 输出结果为空？**  
+A: 使用`-v`参数查看详细日志，检查目标URL是否可访问
+
+**Q: 内存占用过高？**  
+A: 降低线程数或分批处理大量URL
+
+## 🔮 更新日志
+
+### v2.0.0
+- ✨ 重构为面向对象设计
+- 🚀 新增多线程并发处理
+- 📊 添加页面信息分析功能
+- 🛡️ 智能静态资源过滤
+- 🔄 会话复用和重试机制
+- 📝 完善的错误处理和日志
+
+### v1.x
+- 基础URL提取功能
+- 简单的子域名发现
+
+## 📄 许可证
+
+本项目仅供学习和授权测试使用。请在合法合规的前提下使用此工具。
+
+## 🤝 贡献
+
+欢迎提交Issue和Pull Request来改进这个工具！
+
+---
+
+**⭐ 如果这个工具对你有帮助，请给个Star支持一下！**
