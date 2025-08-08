@@ -1,152 +1,139 @@
-# JSFinder
+这是一个为你改进后的 Python 脚本量身定制的 `README.md` 文件。它清晰地介绍了脚本的功能、安装、使用方法，并提供了详细的参数说明和示例，旨在让用户能快速上手。
 
-JSFinder is a tool for quickly extracting URLs and subdomains from JS files on a website.
+-----
 
-JSFinder是一款用作快速在网站的js文件中提取URL，子域名的工具。
+# URL & Subdomain Extractor (Optimized)
 
-提取URL的正则部分使用的是[LinkFinder](https://github.com/GerbenJavado/LinkFinder) 
+这是一个功能强大的 Python 脚本，用于从网站和文件中高效、并发地提取 URLs、子域名和页面信息。它支持深度爬取，能够处理动态内容中的链接，并提供多种输出格式，包括纯文本和 JSON。
 
-JSFinder获取URL和子域名的方式：
+## 主要特性
 
-![image](https://i.loli.net/2020/05/24/R2fImgNZHPkvhEj.png)
+  - **高效并发**: 使用多线程并发处理 URLs，显著提升扫描速度。
+  - **鲁棒性强**: 内置重试机制，能够应对网络波动和服务器错误（如 500, 429 等）。
+  - **深度提取**: 支持指定爬取深度，能够从链接中发现更多隐藏的资源。
+  - **全面解析**: 不仅从 HTML 中提取链接，还能解析内联和外部 JavaScript 文件中的 URLs。
+  - **智能过滤**: 自动过滤静态资源（如图片、CSS）和无效链接，专注于有价值的端点。
+  - **多种输出**: 支持将结果输出到URLs文件、子域名文件、页面信息文件，或统一的 **JSON** 文件，便于自动化和数据处理。
+  - **友好的用户界面**: 提供进度条，让长时间运行的任务状态一目了然。
 
-Blog: https://threezh1.com/
+## 安装
 
-## 更新说明
+### 依赖
 
-- 增加油猴脚本用于在浏览器上访问页面时获取域名与接口，具体可见：https://github.com/Threezh1/Deconstruct/tree/main/DevTools_JSFinder
+该脚本依赖于以下 Python 库：
 
-## 用法
+  - `requests`   ——“请求”
+  - `beautifulsoup4`
+  - `tqdm`
+  - `urllib3`
 
-- **简单爬取**
+你可以使用 `pip` 一次性安装所有依赖：
 
-```
-python JSFinder.py -u http://www.mi.com
-```
-
-这个命令会爬取 http://www.mi.com 这单个页面的所有的js链接，并在其中发现url和子域名
-
-返回示例：
-
-```
-url:http://www.mi.com                                         
-Find 50 URL:                                                  
-http://api-order.test.mi.com                                  
-http://api.order.mi.com                                       
-http://userid.xiaomi.com/userId                               
-http://order.mi.com/site/login?redirectUrl=                                                   
-...已省略                            
-                                                              
-Find 26 Subdomain:                                            
-api-order.test.mi.com                                         
-api.order.mi.com                                              
-userid.xiaomi.com                                             
-order.mi.com                                                                                              
-...已省略
-
+```bash   ”“bash   ”“bash”“bash
+pip install requests beautifulsoup4 tqdm urllib3
 ```
 
-- **深度爬取**
+### 克隆仓库
 
-```
-python JSFinder.py -u http://www.mi.com -d
-```
-
-深入一层页面爬取JS，时间会消耗的更长。
-
-建议使用-ou 和 -os来指定保存URL和子域名的文件名。 例如：
-
-```
-python JSFinder.py -u http://www.mi.com -d -ou mi_url.txt -os mi_subdomain.txt
+```bash
+git clone https://github.com/yourusername/url-extractor.git
+cd url-extractor
 ```
 
-- **批量指定URL/指定JS**
+（如果你的代码托管在 GitHub 上，可以替换为你的仓库链接）
 
-指定URL：
+## 使用方法
 
-```
-python JSFinder.py -f text.txt
-```
+### 基础用法
 
-指定JS：
+  - **从单个 URL 提取**:
 
-```
-python JSFinder.py -f text.txt -j
-```
+    ```bash
+    python main.py -u https://example.com
+    ```
 
-可以用brupsuite爬取网站后提取出URL或者JS链接，保存到txt文件中，一行一个。
+  - **从文件中的 URLs 批量提取**:
 
-指定URL或JS就不需要加深度爬取，单个页面即可。
+    `urls.txt` 文件内容示例：
 
-- **其他**
+    ```
+    https://example.com/page1
+    https://example.com/page2
+    ```
 
--c 指定cookie来爬取页面 例：
+    执行命令：
 
-```
-python JSFinder.py -u http://www.mi.com -c "session=xxx"
-```
+    ```bash   ”“bash   ”“bash”“bash
+    python main.py -f urls.txt
+    ```
 
--ou 指定文件名保存URL链接 例：
+### 深度爬取
 
-```
-python JSFinder.py -u http://www.mi.com -ou mi_url.txt
-```
+使用 `-d` 参数指定爬取深度。例如，爬取首页以及从首页找到的链接，深度为 1。
 
--os 指定文件名保存子域名 例：
-
-```
-python JSFinder.py -u http://www.mi.com -os mi_subdomain.txt
+```bash   ”“bash   ”“bash”“bash
+python main.py -u https://example.com -d 1
 ```
 
-- **注意**
+### 提取并保存结果
 
-url 不用加引号
+  - **同时保存到多个文件**:
 
-url 需要http:// 或 https://
+    ```bash   ”“bash   ”“bash”“bash
+    python main.py -u https://example.com -d 1 -ou urls.txt -os subdomains.txt -ow web_info.txt
+    ```
 
-指定JS文件爬取时，返回的URL为相对URL
+  - **保存到 JSON 文件**:
 
-指定URL文件爬取时，返回的相对URL都会以指定的第一个链接的域名作为其域名来转化为绝对URL。
+    `--output-json   ——output-json` 参数会将所有结果（URLs、子域名和页面信息）保存到一个结构化的 JSON 文件中。
 
-- **截图**
+    ```bash   ”“bash
+    python main.py -u https://example.com -oj results.json
+    ```
 
-实测简单爬取：
+## 命令行参数
 
+| 参数              | 缩写 | 类型     | 描述                                       |
+| ----------------- | ---- | -------- | ------------------------------------------ |
+| `--url   url——`           | `-u` | `string` | 目标网站的 URL。                             |
+| `--file   ——文件`          | `-f` | `string   字符串` | 包含 URLs 的文件路径。                         |
+| `--cookie`        | `-c` | `string   字符串` | 请求时使用的 Cookie 字符串。               |
+| `--deep   ——深`          | `-d` | `int`    | 爬取的深度（默认为 0，不进行深度爬取）。 |
+| `--threads   ——线程`       | `-t` | `int`    | 并发线程数（默认为 10）。                    |
+| `--output-urls   ——output-urls`   | `-ou`| `string   字符串` | 发现的 URLs 列表输出文件路径。             |
+| `--output-subdomains   ——output-subdomains`|`-os`|`string   字符串` | 发现的子域名列表输出文件路径。             |
+| `--output-web-info   ——output-web-info`|`-ow   …噢`|`string   字符串` | 页面标题、状态码等信息输出文件路径。       |
+| `--output-json   ——output-json`   | `-oj   ——“请求”`| `string   字符串` | 所有结果的 JSON 格式输出文件路径。         |
+| `--verbose   ——详细`       | `-v   ——“请求”` | `bool   保龄球`   | 启用详细输出，显示更多日志信息。             |
+
+## 示例
+
+### 场景一：单 URL 深度爬取并输出所有结果
+
+```bash   ”“bash   ”“bash”“bash
+python main.py -u https://docs.python.org/3/ -d 2 -ou python_docs_urls.txt -os python_docs_subs.txt -oj python_docs_results.json```bash
+   ""bash   ""bash""bash
 ```
-python3 JSFinder.py -u https://www.jd.com/
 ```
 
-URL:
+  - `url`: 从 `https://docs.python.org/3/` 开始。
+  - `deep   深的`: 爬取深度为 2。
+  - `output-urls`: URLs 保存到 `python_docs_urls.txt`。   ”“bash
+  - `output-subdomains`: 子域名保存到 `python_docs_subs.txt`。   ”“bash   ”“bash   ”“bash
+  - `output-json`: 所有信息保存到 `python_docs_results.json`。
 
-![02.jpg](https://i.loli.net/2020/05/24/aROFI5fC3UyK8EP.jpg)
+### 场景二：使用 Cookie 批量提取
 
-![03.jpg](https://i.loli.net/2020/05/24/rXC4Bba7oMw8AHW.jpg)
-
-Subdomain:
-
-![01.jpg](https://i.loli.net/2020/05/24/69WvDmy7al4hQfd.jpg)
-
-实测深度爬取：
-
-```
-python3 JSFinder.py -u https://www.jd.com/ -d -ou jd_url.txt -os jd_domain.txt
+```bash   ”“bash
+python main.py -f protected_urls.txt -c "sessionid=xyzabc123" -ou protected_endpoints.txt运行 `main.py` 脚本，使用 `-f` 参数指定文件 `protected_urls.txt`，使用 `-c` 参数设置 `sessionid=xyzabc123`，并将结果输出到 `protected_endpoints.txt` 文件中。
 ```
 
-![05.jpg](https://i.loli.net/2020/05/24/dhxTQnaW4ef9Vzu.jpg)
+  - `file   文件`: 从 `protected_urls.txt` 批量读取 URL。
+  - `cookie   饼干`: 使用指定的 Cookie 进行身份验证。
+  - `output-urls`: 提取的 URLs 保存到 `protected_endpoints.txt`。
+   ”“bash
+-----   ”“bash   ”“bash   ”“bash
 
-![06.jpg](https://i.loli.net/2020/05/24/NAX9PnLaW6melVk.jpg)
+## 许可证
 
-实际测试：
-```
-http://www.oppo.com
-URL:4426 个
-子域名：24 个
-
-http://www.mi.com
-URL:1043 个
-子域名：111 个
-
-http://www.jd.com
-URL:3627 个
-子域名：306 个
-```
+该项目根据 MIT 许可证发布。
