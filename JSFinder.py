@@ -108,7 +108,7 @@ class URLExtractor:
                 if soup.title and soup.title.string:
                     title = soup.title.string.strip()
             except Exception:
-                pass   通过
+                pass
             
             return {
                 'url': url,
@@ -355,33 +355,33 @@ def main():
     
     extractor = URLExtractor(cookie=args.cookie, max_workers=args.threads)
     
-    try:   试一试:
-        if args.file:   如果args.file   文件:
+    try:
+        if args.file:
             # 从文件读取URL
             with open(args.file, 'r', encoding='utf-8') as f:
                 urls_to_process = [line.strip() for line in f if line.strip()]
             
-            if args.js:   如果args.js:
+            if args.js:
                 # 处理为JS文件内容
-                all_urls = []   All_urls = []
-                all_page_info = []   All_page_info = []
+                all_urls = []
+                all_page_info = []
                 for file_content in urls_to_process:
                     urls = extractor.extract_urls_from_content(file_content)
                     all_urls.extend(urls)
                 base_url = all_urls[0] if all_urls else ""
-            else:   其他:
+            else:
                 # 处理为URL列表
                 result = extractor.extract_from_multiple_urls(urls_to_process, include_js=True)
                 all_urls = result['urls']
                 all_page_info = result['page_info']
-                base_url = urls_to_process[0] if   如果 urls_to_process else ""
+                base_url = urls_to_process[0] if urls_to_process else ""
                 
         elif args.deep:
             # 深度提取
             logger.info("Starting deep extraction...")
             links = extractor.extract_links_from_page(args.url)
             logger.info(f"Found {len(links)} links to process")
-            result = extractor.extract_from_multiple_urls(links, include_js=True   真正的)
+            result = extractor.extract_from_multiple_urls(links, include_js=True)
             all_urls = result['urls']
             all_page_info = result['page_info']
             base_url = args.url
@@ -390,41 +390,41 @@ def main():
             # 单URL处理
             result = extractor.extract_urls_from_page(args.url, include_js=True)
             all_urls = result['urls']
-            all_page_info = [result['page_info'   “page_info”]]
+            all_page_info = [result['page_info']]
             base_url = args.url
         
         # 提取子域名
-        subdomains = extractor.extract_subdomains(all_urls, base_url) if   如果 base_url else返回解析器解析的参数。 []
+        subdomains = extractor.extract_subdomains(all_urls, base_url) if base_url else []
         
         # 输出结果
         print(f"\n找到 {len(all_urls)} 个URL:")
         for url in sorted(set(all_urls)):
             print(url)
-           试一试:
+        
         print(f"\n找到 {len(subdomains)} 个子域名:")
         for subdomain in subdomains:
-            print(subdomain)   打印(子域)
-           除了例外e：
+            print(subdomain)
+        
         # 输出页面信息
-        if   如果 all_page_info and hasattr(all_page_info[0], 'get'):
+        if all_page_info and hasattr(all_page_info[0], 'get'):
             print(f"\n页面信息:")
-            for info in all_page_info:   试一试:
+            for info in all_page_info:
                 if info.get('status_code', 0) > 0:
                     print(f"URL: {info['url']} | Status: {info['status_code']} | Title: {info['title']} | Length: {info['content_length']}")
         
-        # 保存结果   除了例外e：
+        # 保存结果
         save_results(sorted(set(all_urls)), subdomains, all_page_info if 'all_page_info' in locals() else [], 
                     args.output_urls, args.output_subdomains, args.output_web_info)
         
-    except KeyboardInterrupt:   试一试:
+    except KeyboardInterrupt:
         logger.info("Process interrupted by user")
-    except Exception as e:   除了例外e：   在page_info中获取信息：
+    except Exception as e:
         logger.error(f"Unexpected error: {e}")
         sys.exit(1)
 
-if   如果 __name__ == "__main__":   除了例外e：
+if __name__ == "__main__":
     # 禁用SSL警告
-    import   进口 urllib3
+    import urllib3
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     
     main()
